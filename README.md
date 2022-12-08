@@ -1,0 +1,11 @@
+# Cache replacement policies
+- [X] Random replacement (RR)
+- [ ] First in first out (FIFO)
+- [ ] Last in first out (LIFO)
+- [ ] First in last out (FILO)
+- [ ] Least recently used (LRU)
+- [ ] Time aware least recently used (TLRU)
+- [ ] Most recently used (MRU)
+- [ ] Least-frequently used (LFU)
+- [ ] Least frequent recently used (LFRU)
+- [ ] LFU with dynamic aging (LFUDA)
