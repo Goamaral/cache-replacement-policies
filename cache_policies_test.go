@@ -10,13 +10,20 @@ import (
 	"time"
 )
 
+type CacheOp uint
+
+const (
+	SetOp CacheOp = iota
+	GetOp
+)
+
 type Test struct {
 	TestName    string
 	CachePolicy cache_replacement_policies.CachePolicy
 }
 
 type DataPair struct {
-	Op    int // 0-Set 1-Get
+	Op    CacheOp
 	Key   string
 	Value int
 }
@@ -29,13 +36,13 @@ func TestCachePolicies(t *testing.T) {
 	insertedValues := []int{}
 
 	for n := 0; n < nOps; n++ {
-		op := 0
+		op := SetOp
 		if n != 0 {
-			op = rng.Intn(2)
+			op = CacheOp(rng.Intn(2))
 		}
 
 		var value int
-		if op == 0 { // Set
+		if op == SetOp { // Set
 			value = rng.Intn(cacheSize * 4)
 			insertedValues = append(insertedValues, value)
 		} else { // Get
@@ -52,6 +59,10 @@ func TestCachePolicies(t *testing.T) {
 			TestName:    "Random Replacement",
 			CachePolicy: cache_replacement_policies.NewRRCachePolicy(),
 		},
+		{
+			TestName:    "First In First Out",
+			CachePolicy: cache_replacement_policies.NewFIFOCachePolicy(),
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.TestName, func(t *testing.T) {
@@ -60,9 +71,9 @@ func TestCachePolicies(t *testing.T) {
 
 			cache := cache_replacement_policies.NewCache(cacheSize, test.CachePolicy)
 			for _, d := range dataset {
-				if d.Op == 0 { // Set
+				if d.Op == SetOp {
 					cache.Set(d.Key, d.Value)
-				} else { // Get
+				} else {
 					if isCacheHit, _ := cache.Get(d.Key); isCacheHit {
 						cacheHits++
 					}

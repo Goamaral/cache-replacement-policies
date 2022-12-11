@@ -3,7 +3,6 @@ package cache_replacement_policies
 type Cache interface {
 	Set(key string, value any)
 	Get(key string) (bool, any)
-	GetItems() []cacheItem
 }
 
 type cacheItem struct {
@@ -12,45 +11,33 @@ type cacheItem struct {
 }
 
 type cache struct {
-	itemMapper map[string]int // TODO: Search better data structure to improve key list fetching
-	items      []cacheItem
-	size       int
-	policy     CachePolicy
+	items  map[string]any
+	size   int
+	policy CachePolicy
 }
 
 func NewCache(size int, policy CachePolicy) Cache {
 	return &cache{
-		itemMapper: map[string]int{},
-		items:      []cacheItem{},
-		size:       size,
-		policy:     policy,
+		items:  map[string]any{},
+		size:   size,
+		policy: policy,
 	}
 }
 
 func (c *cache) Set(key string, value any) {
-	if _, found := c.itemMapper[key]; found {
+	if _, found := c.items[key]; found {
 		return
 	}
-	if len(c.itemMapper) < c.size {
-		i := len(c.items)
-		c.items = append(c.items, cacheItem{key, value})
-		c.itemMapper[key] = i
-	} else {
-		invalidIndex := c.policy.PickIndexToInvalidate(c.items)
-		delete(c.itemMapper, c.items[invalidIndex].key)
-		c.itemMapper[key] = invalidIndex
-		c.items[invalidIndex] = cacheItem{key, value}
+	if len(c.items) == c.size {
+		key := c.policy.PickKeyToInvalidate()
+		delete(c.items, key)
+		c.policy.OnKeyInvalidate(key)
 	}
+	c.items[key] = value
+	c.policy.OnKeySet(key)
 }
 
 func (c *cache) Get(key string) (bool, any) {
-	i, found := c.itemMapper[key]
-	if found {
-		return true, c.items[i]
-	}
-	return false, nil
-}
-
-func (c *cache) GetItems() []cacheItem {
-	return c.items
+	item, found := c.items[key]
+	return found, item
 }
