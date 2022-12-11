@@ -36,10 +36,10 @@ func (c *cache) Set(key string, value any) {
 		c.items = append(c.items, cacheItem{key, value})
 		c.itemMapper[key] = i
 	} else {
-		discardIndex := c.policy.PickIndexToDiscard(c.items)
-		delete(c.itemMapper, c.items[discardIndex].key)
-		c.itemMapper[key] = discardIndex
-		c.items[discardIndex] = cacheItem{key, value}
+		invalidIndex := c.policy.PickIndexToInvalidate(c.items)
+		delete(c.itemMapper, c.items[invalidIndex].key)
+		c.itemMapper[key] = invalidIndex
+		c.items[invalidIndex] = cacheItem{key, value}
 	}
 }
 

@@ -3,22 +3,74 @@ package cache_replacement_policies_test
 import (
 	"cache_replacement_policies"
 	"fmt"
-	"math/rand"
 	"strconv"
+
+	"math/rand"
 	"testing"
 	"time"
 )
 
-const CacheSize = 5
+type Test struct {
+	TestName    string
+	CachePolicy cache_replacement_policies.CachePolicy
+}
 
-func TestRRCachePolicy(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
+type DataPair struct {
+	Op    int // 0-Set 1-Get
+	Key   string
+	Value int
+}
 
-	cache := cache_replacement_policies.NewCache(CacheSize, cache_replacement_policies.NewRRCachePolicy())
-	for n := 0; n < CacheSize*2; n++ {
-		value := rand.Intn(CacheSize * 4)
+func TestCachePolicies(t *testing.T) {
+	const cacheSize = 5
+	const nOps = 50
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	var dataset []DataPair
+	insertedValues := []int{}
+
+	for n := 0; n < nOps; n++ {
+		op := 0
+		if n != 0 {
+			op = rng.Intn(2)
+		}
+
+		var value int
+		if op == 0 { // Set
+			value = rng.Intn(cacheSize * 4)
+			insertedValues = append(insertedValues, value)
+		} else { // Get
+			i := rng.Intn(len(insertedValues))
+			value = insertedValues[i]
+		}
 		key := strconv.FormatInt(int64(value), 10)
-		cache.Set(key, value)
-		fmt.Printf("%d -> %+v\n", value, cache.GetItems())
+
+		dataset = append(dataset, DataPair{Op: op, Key: key, Value: value})
+	}
+
+	tests := []Test{
+		{
+			TestName:    "Random Replacement",
+			CachePolicy: cache_replacement_policies.NewRRCachePolicy(),
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.TestName, func(t *testing.T) {
+			cacheHits := 0
+			totalGetOps := 0
+
+			cache := cache_replacement_policies.NewCache(cacheSize, test.CachePolicy)
+			for _, d := range dataset {
+				if d.Op == 0 { // Set
+					cache.Set(d.Key, d.Value)
+				} else { // Get
+					if isCacheHit, _ := cache.Get(d.Key); isCacheHit {
+						cacheHits++
+					}
+					totalGetOps++
+				}
+			}
+
+			fmt.Printf("%s %.2f%% Cache Hit\n", test.TestName, float64(cacheHits*100)/float64(totalGetOps))
+		})
 	}
 }
