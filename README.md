@@ -1,7 +1,7 @@
 # Cache replacement policies
 - [X] Random Replacement (RR)
 - [X] First In First Out (FIFO)
-- [ ] Last in first out (LIFO)
+- [X] Last In First Out (LIFO)
 - [ ] Least recently used (LRU)
 - [ ] Time aware least recently used (TLRU)
 - [ ] Most recently used (MRU)

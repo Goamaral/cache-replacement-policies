@@ -29,8 +29,8 @@ type DataPair struct {
 }
 
 func TestCachePolicies(t *testing.T) {
-	const cacheSize = 5
-	const nOps = 50
+	const cacheSize = 1000
+	const nOps = 1000000
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	var dataset []DataPair
 	insertedValues := []int{}
@@ -62,6 +62,10 @@ func TestCachePolicies(t *testing.T) {
 		{
 			TestName:    "First In First Out",
 			CachePolicy: cache_replacement_policies.NewFIFOCachePolicy(),
+		},
+		{
+			TestName:    "Last In First Out",
+			CachePolicy: cache_replacement_policies.NewLIFOCachePolicy(),
 		},
 	}
 	for _, test := range tests {
