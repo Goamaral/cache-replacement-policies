@@ -2,7 +2,7 @@
 - [X] Random Replacement (RR)
 - [X] First In First Out (FIFO)
 - [X] Last In First Out (LIFO)
-- [ ] Least recently used (LRU)
+- [X] Least Recently Used (LRU)
 - [ ] Time aware least recently used (TLRU)
 - [ ] Most recently used (MRU)
 - [ ] Least-frequently used (LFU)

@@ -29,6 +29,8 @@ func (cp *rrCachePolicy) OnKeySet(key string) {
 	cp.keys = append(cp.keys, key)
 }
 
+func (cp rrCachePolicy) OnKeyGet(key string) {}
+
 func (cp *rrCachePolicy) OnKeyInvalidate(key string) error {
 	indexToInvalidate := slices.Index(cp.keys, key)
 	if indexToInvalidate == -1 {

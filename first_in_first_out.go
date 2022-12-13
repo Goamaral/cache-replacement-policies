@@ -22,6 +22,8 @@ func (cp *fifoCachePolicy) OnKeySet(key string) {
 	cp.keys = append(cp.keys, key)
 }
 
+func (cp fifoCachePolicy) OnKeyGet(key string) {}
+
 func (cp *fifoCachePolicy) OnKeyInvalidate(key string) error {
 	indexToInvalidate := slices.Index(cp.keys, key)
 	if indexToInvalidate == -1 {
