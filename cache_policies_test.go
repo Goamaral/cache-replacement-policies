@@ -43,7 +43,7 @@ func TestCachePolicies(t *testing.T) {
 
 		var value int
 		if op == SetOp { // Set
-			value = rng.Intn(cacheSize * 4)
+			value = rng.Intn(cacheSize * 2)
 			insertedValues = append(insertedValues, value)
 		} else { // Get
 			i := rng.Intn(len(insertedValues))
@@ -74,6 +74,10 @@ func TestCachePolicies(t *testing.T) {
 		{
 			TestName:    "Most Recently Used",
 			CachePolicy: cache_replacement_policies.NewMRUCachePolicy(),
+		},
+		{
+			TestName:    "Least Frequently Used",
+			CachePolicy: cache_replacement_policies.NewLFUCachePolicy(),
 		},
 	}
 	for _, test := range tests {
