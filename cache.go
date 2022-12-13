@@ -29,9 +29,9 @@ func (c *cache) Set(key string, value any) {
 		return
 	}
 	if len(c.items) == c.size {
-		key := c.policy.PickKeyToInvalidate()
+		key := c.policy.PickKeyToEvict()
 		delete(c.items, key)
-		c.policy.OnKeyInvalidate(key)
+		c.policy.OnKeyEviction(key)
 	}
 	c.items[key] = value
 	c.policy.OnKeySet(key)

@@ -8,9 +8,10 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+// A random item is evicted
 type rrCachePolicy struct {
 	rng  *rand.Rand
-	keys []string // TODO: Change to binary search tree. Also search other data structures to improve search.
+	keys []string
 }
 
 func NewRRCachePolicy() CachePolicy {
@@ -21,7 +22,7 @@ func NewRRCachePolicy() CachePolicy {
 	}
 }
 
-func (cp rrCachePolicy) PickKeyToInvalidate() string {
+func (cp rrCachePolicy) PickKeyToEvict() string {
 	return cp.keys[cp.rng.Intn(len(cp.keys)-1)]
 }
 
@@ -31,11 +32,11 @@ func (cp *rrCachePolicy) OnKeySet(key string) {
 
 func (cp rrCachePolicy) OnKeyGet(key string) {}
 
-func (cp *rrCachePolicy) OnKeyInvalidate(key string) error {
-	indexToInvalidate := slices.Index(cp.keys, key)
-	if indexToInvalidate == -1 {
-		return fmt.Errorf("can't invalidate key %s not present in cache", key)
+func (cp *rrCachePolicy) OnKeyEviction(key string) error {
+	indexToEvict := slices.Index(cp.keys, key)
+	if indexToEvict == -1 {
+		return fmt.Errorf("can't evict key %s not present in cache", key)
 	}
-	cp.keys = slices.Delete(cp.keys, indexToInvalidate, indexToInvalidate+1)
+	cp.keys = slices.Delete(cp.keys, indexToEvict, indexToEvict+1)
 	return nil
 }

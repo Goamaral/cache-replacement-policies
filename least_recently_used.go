@@ -2,6 +2,7 @@ package cache_replacement_policies
 
 import "time"
 
+// The least recently used item will be evicted
 type lruCachePolicy struct {
 	lastUsedAt           map[string]int64
 	leastRecentlyUsedKey string
@@ -11,7 +12,7 @@ func NewLRUCachePolicy() CachePolicy {
 	return &lruCachePolicy{lastUsedAt: map[string]int64{}}
 }
 
-func (cp lruCachePolicy) PickKeyToInvalidate() string {
+func (cp lruCachePolicy) PickKeyToEvict() string {
 	return cp.leastRecentlyUsedKey
 }
 
@@ -29,7 +30,7 @@ func (cp *lruCachePolicy) OnKeyGet(key string) {
 	cp.lastUsedAt[key] = time.Now().Unix()
 }
 
-func (cp *lruCachePolicy) OnKeyInvalidate(key string) error {
+func (cp *lruCachePolicy) OnKeyEviction(key string) error {
 	delete(cp.lastUsedAt, key)
 	leastRecentlyUsed := struct {
 		key       string

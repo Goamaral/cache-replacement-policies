@@ -2,6 +2,7 @@ package cache_replacement_policies
 
 import "math"
 
+// The least used item will be evicted
 type lfuCachePolicy struct {
 	timesUsed    map[string]int
 	leastUsedKey string
@@ -11,7 +12,7 @@ func NewLFUCachePolicy() CachePolicy {
 	return &lfuCachePolicy{timesUsed: map[string]int{}}
 }
 
-func (cp lfuCachePolicy) PickKeyToInvalidate() string {
+func (cp lfuCachePolicy) PickKeyToEvict() string {
 	return cp.leastUsedKey
 }
 
@@ -29,7 +30,7 @@ func (cp *lfuCachePolicy) OnKeyGet(key string) {
 	cp.timesUsed[key]++
 }
 
-func (cp *lfuCachePolicy) OnKeyInvalidate(key string) error {
+func (cp *lfuCachePolicy) OnKeyEviction(key string) error {
 	delete(cp.timesUsed, key)
 	leastUsed := struct {
 		key    string
