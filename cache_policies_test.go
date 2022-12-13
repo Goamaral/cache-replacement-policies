@@ -30,7 +30,7 @@ type DataPair struct {
 
 func TestCachePolicies(t *testing.T) {
 	const cacheSize = 100
-	const nOps = 100000
+	const nOps = 1000000
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	var dataset []DataPair
 	insertedValues := []int{}
@@ -70,6 +70,10 @@ func TestCachePolicies(t *testing.T) {
 		{
 			TestName:    "Least Recently Used",
 			CachePolicy: cache_replacement_policies.NewLRUCachePolicy(),
+		},
+		{
+			TestName:    "Most Recently Used",
+			CachePolicy: cache_replacement_policies.NewMRUCachePolicy(),
 		},
 	}
 	for _, test := range tests {
